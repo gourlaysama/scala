@@ -12,6 +12,7 @@ package scala.collection
 package immutable
 
 import java.io._
+import scala.annotation.tailrec
 import scala.util.matching.Regex
 import scala.reflect.ClassTag
 
@@ -43,18 +44,20 @@ object PagedSeq {
   /** Constructs a paged character sequence from a string iterator */
   def fromStrings(source: Iterator[String]): PagedSeq[Char] = {
     var current: String = ""
-    def more(data: Array[Char], start: Int, len: Int): Int =
+    @tailrec def more(data: Array[Char], start: Int, len: Int, acc: Int): Int =
       if (current.length != 0) {
         val cnt = current.length min len
         current.getChars(0, cnt, data, start)
         current = current.substring(cnt)
-        if (cnt == len) cnt
-        else (more(data, start + cnt, len - cnt) max 0) + cnt
+        if (cnt == len) acc + cnt
+        else more(data, start + cnt, len - cnt, acc + cnt)
       } else if (source.hasNext) {
         current = source.next
-        more(data, start, len)
+        more(data, start, len, acc)
+      } else if (acc != 0) {
+        acc
       } else -1
-    new PagedSeq(more(_: Array[Char], _: Int, _: Int))
+    new PagedSeq(more(_: Array[Char], _: Int, _: Int, 0))
   }
 
   /** Constructs a paged character sequence from a string iterable */
@@ -236,7 +239,14 @@ private class Page[T: ClassTag](val num: Int) {
   /** The last page as currently present in the sequence; This can change as more
    *  elements get appended to the sequence.  */
   final def latest: Page[T] = {
-    if (later.next != null) later = later.next.latest
+    @tailrec def findLatest(p: Page[T]): Page[T] =
+      if (p.next != null) {
+        findLatest(p.next)
+      } else {
+        p
+      }
+
+    later = findLatest(later)
     later
   }
 
