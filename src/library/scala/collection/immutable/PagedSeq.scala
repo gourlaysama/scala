@@ -182,11 +182,9 @@ extends scala.collection.AbstractSeq[T]
    *   of the current sequence if `end` is larger than its length.
    */
   override def slice(_start: Int, _end: Int): PagedSeq[T] = {
-    page(start)
     val s = start + _start
     val e = if (_end == UndeterminedEnd) _end else start + _end
-    var f = first1
-    while (f.end <= s && !f.isLast) f = f.next
+    var f = page(s)
     new PagedSeq(more, f, s, e)
   }
 
