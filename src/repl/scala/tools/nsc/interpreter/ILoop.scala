@@ -203,6 +203,11 @@ class ILoop(in0: Option[BufferedReader], protected val out: JPrintWriter)
   /** Prompt to print when awaiting input */
   def prompt = currentPrompt
 
+  val coloredPrompt = {
+    import scala.Console.{BLUE, RESET}
+    if (ColorSupport.colorEnabled) () => BLUE + prompt + RESET else prompt _
+  }
+
   import LoopCommand.{ cmd, nullary }
 
   /** Standard commands **/
@@ -433,7 +438,7 @@ class ILoop(in0: Option[BufferedReader], protected val out: JPrintWriter)
 
   private def readOneLine() = {
     out.flush()
-    in readLine prompt
+    in readLine coloredPrompt()
   }
 
   /** The main read-eval-print loop for the repl.  It calls
