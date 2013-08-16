@@ -11,7 +11,7 @@ import IMain._
 
 /** Like ReplGlobal, a layer for ensuring extra functionality.
  */
-class ReplReporter(intp: IMain) extends ConsoleReporter(intp.settings, Console.in, new ReplStrippingWriter(intp)) {
+class ReplReporter(intp: IMain) extends ColoringConsoleReporter(intp.settings, Console.in, new ReplStrippingWriter(intp), ColorSupport.colorEnabled) {
   def printUntruncatedMessage(msg: String) = withoutTruncating(printMessage(msg))
 
   override def printMessage(msg: String) {
