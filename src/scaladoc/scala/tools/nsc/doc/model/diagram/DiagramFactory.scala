@@ -74,7 +74,7 @@ trait DiagramFactory extends DiagramDirectiveParser {
         // The implementation would need to add the annotations and the logic to select nodes (or create new ones)
         // and add edges to the diagram -- I bet it wouldn't take too long for someone to do it (one or two days
         // at most) and it would be a great add to the diagrams.
-        if (tpl.sym == AnyRefClass)
+        if (tpl.sym == AnyRefClass || tpl.sym == AnyClass)
           subclasses = List(aggregationNode("All user-defined classes and traits"))
 
         val filteredSuperclasses = if (diagramFilter.hideSuperclasses) Nil else superclasses
