@@ -1,0 +1,15 @@
+t5691.scala:7: warning: type parameter D defined in method foobar shadows trait D defined in class B. You may want to rename your type parameter, or possibly remove it.
+def foobar[D](in: D) = in.toString
+                  ^
+t5691.scala:10: warning: type parameter T defined in class A shadows type T defined in class B. You may want to rename your type parameter, or possibly remove it.
+class A[T](t: T) {
+              ^
+t5691.scala:12: warning: type parameter T defined in method bar shadows type T defined in class A. You may want to rename your type parameter, or possibly remove it.
+  def bar[T](w: T) = w.toString
+                ^
+t5691.scala:16: warning: type parameter Byte defined in class C shadows class Byte defined in package scala. You may want to rename your type parameter, or possibly remove it.
+class C[Byte](b: Byte)
+                 ^
+error: No warnings can be incurred under -Xfatal-warnings.
+four warnings found
+one error found

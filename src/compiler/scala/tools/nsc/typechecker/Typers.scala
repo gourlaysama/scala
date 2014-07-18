@@ -4781,6 +4781,17 @@ trait Typers extends Adaptations with Tags with TypersTracking with PatternTyper
               case sym      => typed1(tree setSymbol sym, mode, pt)
                 }
           case LookupSucceeded(qual, sym)   =>
+
+            if (settings.warnTypeParameterShadow) {
+              if (sym.isType && sym.asType.isParameter && !sym.owner.isSynthetic) {
+                context.lookupSymbol(name, s => qualifies(s) && s != sym) match {
+                  case LookupSucceeded(qual2, sym2) => context.warning(tree.pos,
+                    s"type parameter ${sym.name} defined in ${sym.owner} shadows $sym2 defined in ${sym2.owner}. You may want to rename your type parameter, or possibly remove it.");
+                  case _ =>
+                }
+              }
+            }
+
             (// this -> Foo.this
             if (sym.isThisSym)
               typed1(This(sym.owner) setPos tree.pos, mode, pt)
