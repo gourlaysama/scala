@@ -18,7 +18,11 @@ object scaladoc extends Command with SettingPrinter {
 
   val settings = new Settings(s => (), s => ())
 
-  val additionalSettingDescriptions = Map.empty[String, AbstractText]
+  val additionalSettingDescriptions: Map[String, AbstractText] = Map(
+  "-diagrams" -> ("Diagram generation requires the graphviz " & Mono("dot") & " diagram tool " &
+                  "to be installed.")
+  "-diagrams-dot-path" -> ("By default, " & Mono("dot") & "is assumed to be on the user " & Mono("PATH") & ".")
+  )
 
   val scaladocSettings: Seq[Definition] = settings.scaladocSpecific.filterNot(_.isPrivate).toSeq.sortBy(_.name).map(settingToDefinition)
 

@@ -42,7 +42,7 @@ object scala extends Command with SettingPrinter {
   val synopsis = Section("SYNOPSIS",
 
     CmdLine(
-      " [ " & Argument("option") & " ]... " &
+      " [ " & Argument("options") & " ] " &
       "[ " & Argument("torun") & " " & Argument("argument") &
       "... ]"))
 

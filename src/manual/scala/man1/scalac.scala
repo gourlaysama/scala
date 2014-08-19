@@ -25,7 +25,7 @@ object scalac extends Command with SettingPrinter {
             "semicolon-separated list of paths. This does not override the " &
             "built-in (" & Mono("\"boot\"") & ") search path.",
             "The default class path is the current directory. Setting the " &
-            Mono("CLASSPATH") & " variable or using the " & Mono("-classpath") & " " &
+            Mono("CLASSPATH") & " variable or using the " & CmdOption("classpath") & " " &
             "command-line option overrides that default, so if you want to " &
             "include the current directory in the search path, you must " &
             "include " & Mono("\".\"") & " in the new settings."),
@@ -35,7 +35,12 @@ object scalac extends Command with SettingPrinter {
             "code in the Scala interpreter will return the default value " &
             "on your system:",
             MBold("    scala> ") &
-            Mono("new java.io.InputStreamReader(System.in).getEncoding"))
+            Mono("new java.io.InputStreamReader(System.in).getEncoding")),
+  "-Xlint"   ->
+    SeqPara("On top of the list above, additional unnamed lint warnings can appear if " &
+    "at least one warning above is enabled.",
+    CmdOption("Xlint") & " alone with no argument enables all lint warnings."
+    )
   )
 
   val standardSettings: Seq[Definition] = settings.visibleSettings.filter(_.isStandard).toSeq.sortBy(_.name).map(settingToDefinition)
@@ -87,6 +92,10 @@ object scalac extends Command with SettingPrinter {
     Section("Advanced Options", DefinitionList(advancedSettings:_*)),
 
     Section("Compilation Phases",
+      "Plugins and compiler options can disable some of the phases listed below, " &
+      "as well as add additional phases. Run " & CmdOption("Xshow-phases") &
+      " with a given set of options to show phases available in that particular " &
+      "context.",
       DefinitionList(
         Definition(
           MItalic("parser"),
@@ -117,10 +126,10 @@ object scalac extends Command with SettingPrinter {
           "reference/override checking, translate nested objects"),
 	Definition(
           MItalic("selectiveanf"),
-          "ANF pre-transform for " & MItalic("@cps") & " (CPS plugin)"),
+          "ANF pre-transform for " & MItalic("@cps") & " (if CPS plugin enabled)"),
 	Definition(
           MItalic("selectivecps"),
-          MItalic("@cps") & "-driven transform of selectiveanf assignements (CPS plugin)"),
+          MItalic("@cps") & "-driven transform of selectiveanf assignements (if CPS plugin enabled)"),
 	Definition(
           MItalic("uncurry"),
           "uncurry, translate function values to anonymous classes"),

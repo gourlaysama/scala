@@ -45,7 +45,9 @@ trait SettingPrinter { this: Command =>
 
     val descr: AbstractText = s match {
       case i: MutableSettings#IntSetting => SeqPara(i.helpDescription, s"default: ${i.default}" + i.range.map(r => s", range: ${r._1}-${r._2}").getOrElse(""))
-      case m: MutableSettings#MultiChoiceSetting => SeqPara(m.help, CmdOptionBound(trimName(m.name), "_") & " to enable all, " & CmdOptionBound(trimName(m.name), "help") & " to list available options.")
+      case m: MutableSettings#MultiChoiceSetting => SeqPara(m.help,
+        CmdOptionBound(trimName(m.name), "_") & " to enable all, " & CmdOptionBound(trimName(m.name), "help") & " to list available options. " & 
+        "Individual options can be disabled by prefixing them with " & Mono("'-'") & ".")
       case m: MutableSettings#MultiStringSetting => SeqPara(m.helpDescription, "This option can be specified multiple times.")
       case p: MutableSettings#PhasesSetting => SeqPara(p.helpDescription, "Run " & CmdOption("Xshow-phases") & " to list available phases.")
       case _ => s.helpDescription
