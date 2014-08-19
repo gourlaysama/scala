@@ -39,4 +39,7 @@ class GenericRunnerSettings(error: String => Unit) extends Settings(error) {
   val nc = BooleanSetting(
       "-nc",
       "do not use the fsc compilation daemon") withAbbreviation "-nocompdaemon"
+
+    // additional options provided by this runner
+  val runnerSettings: List[Setting] = List(howtorun, loadfiles, execute, save, nc)
 }

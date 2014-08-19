@@ -5,14 +5,33 @@
 
 package scala.man1
 
+import _root_.scala.tools.nsc.GenericRunnerSettings
+
 /**
  *  @author Stephane Micheloud
  *  @version 1.0
  */
-object scala extends Command {
+object scala extends Command with SettingPrinter {
   import _root_.scala.tools.docutil.ManPage._
 
   protected def cn = new Error().getStackTrace()(0).getClassName()
+
+  val settings = new GenericRunnerSettings(s => ())
+
+  val additionalSettingDescriptions = Map(
+    "-howtorun" -> ("This indicates how " & Argument("torun") & " should be interpreted. See " &
+                   Link(Bold("DESCRIPTION"), "#description") & " below."),
+    "-i"        -> Text("It is only meaningful for interactive shells."),
+    "-save"     -> ("When running a script, this will " &
+                   "save the compiled version in a file with the same name as the " &
+                   "script but with an extension of " & Mono(".jar") & ".  On subsequent " &
+                   "runs of the same script, the pre-compiled " & Mono(".jar") & " file " &
+                   "will be used if it is newer than the script file."),
+    "-nc"       -> ("See " & Link(Bold("fsc") & "(1)", "fsc.html") & " for more on the offline " &
+                   "compilation daemon.")
+  )
+
+  val runnerSettings: Seq[Definition] = settings.runnerSettings.filterNot(_.isPrivate).toSeq.sortBy(_.name).map(settingToDefinition)
 
   val name = Section("NAME",
 
@@ -27,55 +46,32 @@ object scala extends Command {
       "[ " & Argument("torun") & " " & Argument("argument") &
       "... ]"))
 
-  val parameters = Section("PARAMETERS",
+  val parameters = Section("PARAMETERS", DefinitionList(
+    Definition(
+      Mono(Argument("torun")),
+      "A top-level object or a script file to run."),
+
+    Definition(
+      Mono(Argument("argument")),
+      "An arguments to pass to " & Argument("torun") & ".")))
+
+  val options = Section("OPTIONS",
+    "If any compiler options are specified, they must be first in the " &
+    "command line and must be followed by a bare hypen (" & Quote("-") &
+    ") character. " &
+    "If no arguments are specified after the optional compiler arguments, " &
+    "then an interactive Scala shell is started.  Otherwise, either a " &
+    "script file is run, or a pre-compiled Scala object is run.  It " &
+    "is possible to distinguish the last two cases by using an explicit " &
+    Mono("-object") & " or " & Mono("-script") & " flag, but usually the " &
+    "program can guess correctly.",
 
     DefinitionList(
-      Definition(
+      Seq(Definition(
         Mono(Argument("compiler-option")),
-        "Any scalac option.  See " &
-        Link(Bold("scalac") & "(1)", "scalac.html") & "."),
-
-      Definition(
-        CmdOptionBound("howtorun:", Argument("how")),
-        "How to execute " & Argument("torun") & ", if it is present. " &
-        "Options for " & Argument("how") & " are " & Mono("guess") &
-        " (the default), " & Mono("script") & ", " & Mono("jar") & ", and " & Mono("object") &
-        "."),
-
-      Definition(
-        CmdOption("i", Argument("file")),
-        "Requests that a file be pre-loaded.  It is only " &
-        "meaningful for interactive shells."),
-
-      Definition(
-        CmdOption("e", Argument("string")),
-        "Requests that its argument be executed as Scala code."),
-
-      Definition(
-        CmdOption("savecompiled"),
-        "Save this compiled version of scripts in order to speed up " &
-        "later executions of the same script.  When running a script, " &
-        "save the compiled version in a file with the same name as the " &
-        "script but with an extension of " & Mono(".jar") & ".  On subsequent " &
-        "runs of the same script, the pre-compiled " & Mono(".jar") & " file " &
-        "will be used if it is newer than the script file."),
-
-      Definition(
-        CmdOption("nocompdaemon"),
-        "Do not use the " & MBold("fsc") & " offline compiler."),
-
-      Definition(
-        CmdOptionBound("D", "property=value"),
-        "Set a Java system property.  If no value is specified, " &
-        "then the property is set to the empty string."),
-
-      Definition(
-        Mono(Argument("torun")),
-        "A top-level object or a script file to run."),
-
-      Definition(
-        Mono(Argument("argument")),
-        "An arguments to pass to " & Argument("torun") & ".")))
+        "Any " & MBold("scalac") & " option.  See " &
+        Link(Bold("scalac") & "(1)", "scalac.html") & ".")) ++
+      runnerSettings:_*))
 
   val description = Section("DESCRIPTION",
 
@@ -141,18 +137,6 @@ object scala extends Command {
     "-classpath option is specified, then " & Mono("scala") &
     " will add " & Quote(".") & ", the current directory, to the " &
     "end of the classpath.")
-
-  val options = Section("OPTIONS",
-
-    "If any compiler options are specified, they must be first in the " &
-    "command line and must be followed by a bare hypen (" & Quote("-") &
-    ") character. " &
-    "If no arguments are specified after the optional compiler arguments, " &
-    "then an interactive Scala shell is started.  Otherwise, either a " &
-    "script file is run, or a pre-compiled Scala object is run.  It " &
-    "is possible to distinguish the last two cases by using an explicit " &
-    Mono("-object") & " or " & Mono("-script") & " flag, but usually the " &
-    "program can guess correctly.")
 
   val environment = Section("ENVIRONMENT",
 
@@ -263,8 +247,8 @@ object scala extends Command {
       name,
       synopsis,
       parameters,
-      description,
       options,
+      description,
       environment,
       examples,
       exitStatus,

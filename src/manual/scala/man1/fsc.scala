@@ -5,14 +5,29 @@
 
 package scala.man1
 
+import _root_.scala.tools.nsc.settings.FscSettings
+
 /**
  *  @author Lex Spoon
  *  @version 1.0
  */
-object fsc extends Command {
+object fsc extends Command with SettingPrinter {
   import _root_.scala.tools.docutil.ManPage._
 
   protected def cn = new Error().getStackTrace()(0).getClassName()
+
+  val settings = new FscSettings(s => ())
+
+  val additionalSettingDescriptions = Map(
+    "-shutdown" -> ("The daemon attempts to restart "&
+                    "itself as necessary, but sometimes an explicit shutdown is required. "&
+                    "A common example is if jars on the class path have changed."),
+    "-server"   -> ("Usually this option is not needed. " &
+                    "Note that the hostname must be for a host that shares " &
+                    "the same filesystem.")
+  )
+
+  val fscSettings: Seq[Definition] = settings.fscSpecific.filterNot(_.isPrivate).toSeq.sortBy(_.name).map(settingToDefinition)
 
   val name = Section("NAME",
 
@@ -45,30 +60,12 @@ object fsc extends Command {
     "will also use " &
     "the offline compiler by default, with the same advantages and caveats.")
 
-  val options = Section("OPTIONS",
-
-      "The offline compiler supports " &
-      Link("all options of " & MBold("scalac"), "scalac.html#options") &
-      " plus the following:",
-
-      DefinitionList(
-        Definition(
-          CmdOption("reset"),
-          "Reset compile server caches."),
-        Definition(
-          CmdOption("shutdown"),
-          "Shut down the compilation daemon.  The daemon attempts to restart "&
-          "itself as necessary, but sometimes an explicit shutdown is required. "&
-          "A common example is if jars on the class path have changed."),
-        Definition(
-          CmdOption("server", Argument("hostname:portnumber")),
-          "Specify compile server host at port number.  Usually this option " &
-          "is not needed.  Note that the hostname must be for a host that shares " &
-          "the same filesystem."),
-        Definition(
-          CmdOptionBound("J", Argument("flag")),
-          "Pass " & Mono(Argument("flag")) & " directly to the Java VM for the compilation daemon.")
-    ))
+  val options = Section("OPTIONS",  DefinitionList(
+    Seq(Definition(
+        Mono(Argument("compiler-option")),
+        "Any " & MBold("scalac") & " option.  See " &
+        Link(Bold("scalac") & "(1)", "scalac.html") & ".")) ++
+    fscSettings:_*))
 
   val example = Section("EXAMPLE",
 

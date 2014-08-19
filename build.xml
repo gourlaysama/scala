@@ -892,6 +892,8 @@ TODO:
     <path id="manual.build.path">
       <path refid="external-modules-nocore"/> <!-- xml -->
       <pathelement location="${library.jar}"/>
+      <pathelement location="${reflect.jar}"/>
+      <pathelement location="${compiler.jar}"/>
       <pathelement location="${build.dir}/manmaker/classes"/>
       <path refid="aux.libs"/>  <!-- for ant -->
     </path>

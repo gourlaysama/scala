@@ -22,19 +22,19 @@ trait Command {
     MBold(command) & Mono(" " & opts)
 
   protected def CmdOption(opt: String, params: AbstractText) =
-    Mono(Bold(NDash & opt) & " " & params & " ")
+    Mono(Bold(NDash & opt) & " " & params)
 
   protected def CmdOption(opt: String): AbstractText =
-    Mono(Bold(NDash & opt) & " ")
+    Mono(Bold(NDash & opt))
 
   protected def CmdOptionBound(opt: String, params: AbstractText) =
-    Mono(Bold(NDash & opt) & params & " ")
+    Mono(Bold(NDash & opt) & ":" & params)
 
   protected def CmdOptionLong(opt: String, params: AbstractText) =
-    Mono(Bold(NDash & NDash & opt) & " " & params & " ")
+    Mono(Bold(NDash & NDash & opt) & " " & params)
 
   protected def CmdOptionLong(opt: String): AbstractText =
-    Mono(Bold(NDash & NDash & opt) & " ")
+    Mono(Bold(NDash & NDash & opt))
 
   protected def Argument(arg: String): AbstractText =
     "<" & Italic(arg) & ">"

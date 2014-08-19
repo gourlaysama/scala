@@ -458,7 +458,7 @@ class MutableSettings(val errorFn: String => Unit)
   /** A special setting for accumulating arguments like -Dfoo=bar. */
   class PrefixSetting private[nsc](
     name: String,
-    prefix: String,
+    val prefix: String,
     descr: String)
   extends Setting(name, descr) {
     type T = List[String]

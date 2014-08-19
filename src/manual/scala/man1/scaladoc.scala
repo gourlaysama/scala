@@ -5,14 +5,22 @@
 
 package scala.man1
 
+import _root_.scala.tools.nsc.doc.Settings
+
 /**
  *  @author Gilles Dubochet
  *  @version 1.0
  */
-object scaladoc extends Command {
+object scaladoc extends Command with SettingPrinter {
   import _root_.scala.tools.docutil.ManPage._
 
   protected def cn = new Error().getStackTrace()(0).getClassName()
+
+  val settings = new Settings(s => (), s => ())
+
+  val additionalSettingDescriptions = Map.empty[String, AbstractText]
+
+  val scaladocSettings: Seq[Definition] = settings.scaladocSpecific.filterNot(_.isPrivate).toSeq.sortBy(_.name).map(settingToDefinition)
 
   val scalaLink = Link("Scala 2", "http://scala-lang.org/")
 
@@ -45,7 +53,7 @@ object scaladoc extends Command {
 
     "By default, the generator puts each HTML file in the same directory as " &
     "its source file. You can specify a separate destination directory with " &
-    CmdOption("d") & "(see " & Link(Bold("OPTIONS"), "#options") & ", below).",
+    CmdOption("d") & " (see " & Link(Bold("OPTIONS"), "#options") & ", below).",
 
     // tags are defined in class "scala.tools.nsc.doc.DocGenerator"
     "The recognised format of comments in source is described in the " & Link("online documentation",
@@ -62,69 +70,15 @@ object scaladoc extends Command {
           CmdOption("version"),
           "Print product version and exit."),
         Definition(
-          /*CmdOption("?") & "| " &*/ CmdOption("help"),
-          "Print a synopsis of available options."))),
+          CmdOption("help"),
+          "Print a synopsis of available options."),
+        Definition(
+          Mono(Argument("compiler-option")),
+          "Any " & MBold("scalac") & " option.  See " &
+          Link(Bold("scalac") & "(1)", "scalac.html") & "."))),
 
-    Section("Documentation Options",
-      DefinitionList(
-        Definition(
-          CmdOption("doc-title", Argument("title")),
-          "Define the overall title of the documentation, typically the name of the library being documented."),
-        Definition(
-          CmdOption("doc-version", Argument("version")),
-          "Define the overall version number of the documentation, typically the version of the library being documented."),
-        Definition(
-          CmdOption("doc-source-url", Argument("url")),
-          "Define a URL to be concatenated with source locations for link to source files."),
-        Definition(
-          CmdOption("doc-external-doc", Argument("external-doc")),
-          "Define a comma-separated list of classpath_entry_path#doc_URL pairs describing external dependencies."))),
-
-    Section("Compiler Options",
-      DefinitionList(
-        Definition(
-          CmdOption("verbose"),
-          "Output messages about what the compiler is doing"),
-        Definition(
-          CmdOption("deprecation"),
-          SeqPara(
-            "Indicate whether source should be compiled with deprecation " &
-            "information; defaults to " & Mono("off") & " (" &
-            "accepted values are: " & Mono("on") & ", " & Mono("off") &
-            ", " & Mono("yes") & " and " & Mono("no") & ")",
-            "Available since Scala version 2.2.1")),
-        Definition(
-          CmdOption("classpath", Argument("path")),
-          SeqPara(
-            "Specify where to find user class files (on Unix-based systems " &
-            "a colon-separated list of paths, on Windows-based systems, a " &
-            "semicolon-separate list of paths). This does not override the " &
-            "built-in (" & Mono("\"boot\"") & ") search path.",
-            "The default class path is the current directory. Setting the " &
-            Mono("CLASSPATH") & " variable or using the " & Mono("-classpath") & " " &
-            "command-line option overrides that default, so if you want to " &
-            "include the current directory in the search path, you must " &
-            "include " & Mono("\".\"") & " in the new settings.")),
-        Definition(
-          CmdOption("sourcepath", Argument("path")),
-          "Specify where to find input source files."),
-        Definition(
-          CmdOption("bootclasspath", Argument("path")),
-          "Override location of bootstrap class files (where to find the " &
-          "standard built-in classes, such as \"" & Mono("scala.List") & "\")."),
-        Definition(
-          CmdOption("extdirs", Argument("dirs")),
-          "Override location of installed extensions."),
-        Definition(
-          CmdOption("encoding", Argument("encoding")),
-          SeqPara(
-            "Specify character encoding used by source files.",
-            "The default value is platform-specific (Linux: " & Mono("\"UTF8\"") &
-            ", Windows: " & Mono("\"Cp1252\"") & "). Executing the following " &
-            "code in the Scala interpreter will return the default value " &
-            "on your system:",
-            MBold("    scala> ") &
-            Mono("new java.io.InputStreamReader(System.in).getEncoding"))))))
+    Section("Documentation Options", DefinitionList(
+      scaladocSettings:_*)))
 
   val exitStatus = Section("EXIT STATUS",
 
