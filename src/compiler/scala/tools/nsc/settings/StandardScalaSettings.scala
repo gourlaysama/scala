@@ -33,13 +33,19 @@ trait StandardScalaSettings {
   val encoding =        StringSetting ("-encoding", "encoding", "Specify character encoding used by source files.", Properties.sourceEncoding)
   val explaintypes =   BooleanSetting ("-explaintypes", "Explain type errors in more detail.")
   val feature =        BooleanSetting ("-feature", "Emit warning and location for usages of features that should be imported explicitly.")
-  val g =               ChoiceSetting ("-g", "level", "Set level of generated debugging info.", List("none", "source", "line", "vars", "notailcalls"), "vars")
+  val g =               ChoiceSetting ("-g", "level", "Set level of generated debugging info.", List("none", "source", "line", "vars", "notailcalls"),
+    List("generates no debugging info", "generates only the source file attribute", "generates source and line number information",
+         "generates source, line number and local variable information",
+         "generates all of the above and will not perform tail call optimization"),
+    "vars")
   val help =           BooleanSetting ("-help", "Print a synopsis of standard options")
   val nowarn =         BooleanSetting ("-nowarn", "Generate no warnings.")
   val optimise:        BooleanSetting // depends on post hook which mutates other settings
   val print =          BooleanSetting ("-print", "Print program with Scala-specific features removed.")
   val target =          ChoiceSetting ("-target", "target", "Target platform for object files. All JVM 1.5 targets are deprecated.",
-                          List("jvm-1.5", "jvm-1.6", "jvm-1.7", "jvm-1.8"), "jvm-1.6")
+    List("jvm-1.5", "jvm-1.6", "jvm-1.7", "jvm-1.8"),
+    List("targets JVM 1.5 bytecode (deprecated)", "targets JVM 1.6 bytecode", "targets JVM 1.7 bytecode"),
+    "jvm-1.6")
   val unchecked =      BooleanSetting ("-unchecked", "Enable additional warnings where generated code depends on assumptions.")
   val uniqid =         BooleanSetting ("-uniqid", "Uniquely tag all identifiers in debugging output.")
   val usejavacp =      BooleanSetting ("-usejavacp", "Utilize the java.class.path in classpath resolution.")

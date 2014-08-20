@@ -20,7 +20,7 @@ class Settings(error: String => Unit, val printMsg: String => Unit = println(_))
     "-doc-format",
     "format",
     "Selects in which format documentation is rendered",
-    List("html"),
+    List("html"), List("HTML website"),
     "html"
   )
 
@@ -194,7 +194,7 @@ class Settings(error: String => Unit, val printMsg: String => Unit = println(_))
 
   val docSkipPackages = StringSetting (
     "-skip-packages",
-    "<package1>:...:<packageN>",
+    "package1:...:packageN",
     "A colon-delimited list of fully qualified package names that will be skipped from scaladoc.",
     ""
   )

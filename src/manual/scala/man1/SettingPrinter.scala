@@ -29,12 +29,31 @@ trait SettingPrinter { this: Command =>
       else print(trimName(s.name)) & SeqText(s.abbreviations.map(a => ", " & print(trimName(a))):_*)
     }
 
+    def optionList(choices: List[String], descriptions: List[String], default: String = ""): AbstractText = {
+      val length = choices.map(_.length).max + 4
+
+      EmbeddedParagraph(BulletList(choices.zip(descriptions).map { a =>
+        Mono(a._1.padTo(length, ' ')) & a._2 & (if (a._1 == default) " (default)" else "")
+      }:_*))
+    }
+
+    def multiChoiceDescr(choices: List[String], descriptions: List[String], name: String, default: Option[List[String]]): AbstractText = {
+       val list = optionList(choices, descriptions)
+
+       val defaultDescr = default.fold("will throw an error.": AbstractText){ l =>
+         "is equivalent to using " & CmdOptionBound(name, l.mkString(",") & ".")
+       }
+
+       SeqPara(list, CmdOptionBound(name, "_") & " to enable all, " & CmdOptionBound(name, "help") & " to list available options. " &
+        "Individual options can be disabled by prefixing them with " & Mono("'-'") & ".", "Using " & CmdOption(name) & " alone with no argument " & defaultDescr)
+    }
+
     val cmd = withAbbreviations { n => s match {
       case i: MutableSettings#IntSetting => CmdOption(n, Argument("integer"))
       case p: MutableSettings#PathSetting => CmdOption(n, Argument("path"))
       case s: MutableSettings#StringSetting => CmdOption(n, Argument(s.arg))
       case sc: MutableSettings#ScalaVersionSetting => CmdOptionBound(n, Argument("scala_version"))
-      case m: MutableSettings#MultiChoiceSetting => CmdOptionBound(n, choices(m.choices))
+      case m: MutableSettings#MultiChoiceSetting[_] => CmdOptionBound(n, choices(m.choices))
       case m: MutableSettings#ChoiceSetting => CmdOptionBound(n, choices(m.choices))
       case m: MutableSettings#MultiStringSetting => CmdOptionBound(n, Argument(m.arg))
       case p: MutableSettings#PhasesSetting => CmdOptionBound(n, "{" & Argument("phase1") & "," & Argument("phase2") & ",...}")
@@ -44,10 +63,9 @@ trait SettingPrinter { this: Command =>
     }}
 
     val descr: AbstractText = s match {
+      case m: MutableSettings#ChoiceSetting => SeqPara(m.shortDescription, optionList(m.choices, m.choiceDescriptions, m.default))
       case i: MutableSettings#IntSetting => SeqPara(i.helpDescription, s"default: ${i.default}" + i.range.map(r => s", range: ${r._1}-${r._2}").getOrElse(""))
-      case m: MutableSettings#MultiChoiceSetting => SeqPara(m.help,
-        CmdOptionBound(trimName(m.name), "_") & " to enable all, " & CmdOptionBound(trimName(m.name), "help") & " to list available options. " & 
-        "Individual options can be disabled by prefixing them with " & Mono("'-'") & ".")
+      case m: MutableSettings#MultiChoiceSetting[_] => SeqPara(m.shortDescription, multiChoiceDescr(m.choices, m.descriptions, trimName(m.name), m.default))
       case m: MutableSettings#MultiStringSetting => SeqPara(m.helpDescription, "This option can be specified multiple times.")
       case p: MutableSettings#PhasesSetting => SeqPara(p.helpDescription, "Run " & CmdOption("Xshow-phases") & " to list available phases.")
       case _ => s.helpDescription

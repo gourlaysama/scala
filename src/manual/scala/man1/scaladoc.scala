@@ -20,7 +20,7 @@ object scaladoc extends Command with SettingPrinter {
 
   val additionalSettingDescriptions: Map[String, AbstractText] = Map(
   "-diagrams" -> ("Diagram generation requires the graphviz " & Mono("dot") & " diagram tool " &
-                  "to be installed.")
+                  "to be installed."),
   "-diagrams-dot-path" -> ("By default, " & Mono("dot") & "is assumed to be on the user " & Mono("PATH") & ".")
   )
 

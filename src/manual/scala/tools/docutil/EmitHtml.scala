@@ -86,6 +86,11 @@ object EmitHtml {
            emitText(label)
            out print "</a>"
 
+        case EmbeddedParagraph(para) =>
+           out println "<div>"
+           emitParagraph(para)
+           out println "\n</div>"
+
         case _ =>
           sys.error("unknown text node: " + text)
       }

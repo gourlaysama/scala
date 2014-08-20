@@ -16,6 +16,10 @@ class GenericRunnerSettings(error: String => Unit) extends Settings(error) {
       "how",
       "how to run the specified code",
       List("object", "script", "jar", "guess"),
+      List("argument is the fully qualified name of a runnable Scala object",
+           "argument is a file name containing scala code to interpret",
+           "argument is a runnable jar",
+           "try to guess what the argument is"),
       "guess")
 
   val loadfiles =

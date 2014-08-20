@@ -207,8 +207,8 @@ class MutableSettings(val errorFn: String => Unit)
   }
 
   def BooleanSetting(name: String, descr: String) = add(new BooleanSetting(name, descr))
-  def ChoiceSetting(name: String, helpArg: String, descr: String, choices: List[String], default: String) =
-    add(new ChoiceSetting(name, helpArg, descr, choices, default))
+  def ChoiceSetting(name: String, helpArg: String, descr: String, choices: List[String], choiceDescrs: List[String], default: String) =
+    add(new ChoiceSetting(name, helpArg, descr, choices, choiceDescrs, default))
   def IntSetting(name: String, descr: String, default: Int, range: Option[(Int, Int)], parser: String => Option[Int]) =
     add(new IntSetting(name, descr, default, range, parser))
   def MultiStringSetting(name: String, arg: String, descr: String) = add(new MultiStringSetting(name, arg, descr))
@@ -596,10 +596,10 @@ class MutableSettings(val errorFn: String => Unit)
   class MultiChoiceSetting[E <: MultiChoiceEnumeration] private[nsc](
     name: String,
     helpArg: String,
-    descr: String,
+    val shortDescription: String,
     val domain: E,
     val default: Option[List[String]]
-  ) extends Setting(name, s"$descr: `_' for all, `$name:help' to list") with Clearable {
+  ) extends Setting(name, s"$shortDescription: `_' for all, `$name:help' to list") with Clearable {
 
     withHelpSyntax(s"$name:<_,$helpArg,-$helpArg>")
 
@@ -727,7 +727,7 @@ class MutableSettings(val errorFn: String => Unit)
       val formatStr = s"  %-${choiceLength}s %s"
       choices.zipAll(descriptions, "", "").map {
         case (arg, descr) => formatStr.format(arg, descr)
-      } mkString (f"$descr%n", f"%n", "")
+      } mkString (f"$shortDescription%n", f"%n", "")
     }
 
     def clear(): Unit         = {
@@ -778,10 +778,11 @@ class MutableSettings(val errorFn: String => Unit)
   class ChoiceSetting private[nsc](
     name: String,
     helpArg: String,
-    descr: String,
+    val shortDescription: String,
     override val choices: List[String],
+    override val choiceDescriptions: List[String],
     val default: String)
-  extends Setting(name, descr + choices.mkString(" (", ",", ") default:" + default)) {
+  extends Setting(name, shortDescription + choices.mkString(" (", ",", ") default:" + default)) {
     type T = String
     protected var v: T = default
     def indexOfChoice: Int = choices indexOf value
@@ -796,6 +797,7 @@ class MutableSettings(val errorFn: String => Unit)
       case List(x)                        => errorAndValue("'" + x + "' is not a valid choice for '" + name + "'", None)
       case xs                             => errorAndValue("'" + name + "' does not accept multiple arguments.", None)
     }
+
     def unparse: List[String] =
       if (value == default) Nil else List(name + ":" + value)
     override def tryToSetFromPropertyValue(s: String) = tryToSetColon(s::Nil) // used from ide

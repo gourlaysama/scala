@@ -78,6 +78,9 @@ object EmitManPage {
         case Link(label, url) =>
           emitText(label)
 
+        case EmbeddedParagraph(para) =>
+          emitParagraph(para)
+
         case _ =>
           sys.error("unknown text node: " + text)
       }

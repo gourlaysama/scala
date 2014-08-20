@@ -164,11 +164,17 @@ trait ScalaSettings extends AbsScalaSettings
   val Xdce            = BooleanSetting    ("-Ydead-code", "Perform dead code elimination.")
   val debug           = BooleanSetting    ("-Ydebug", "Increase the quantity of debugging output.")
   //val doc           = BooleanSetting    ("-Ydoc", "Generate documentation")
-  val termConflict    = ChoiceSetting     ("-Yresolve-term-conflict", "strategy", "Resolve term conflicts", List("package", "object", "error"), "error")
+  val termConflict    = ChoiceSetting     ("-Yresolve-term-conflict", "strategy", "Resolve package vs. object term conflicts",
+    List("package", "object", "error"),
+    List("choose package over object; the object will be inacessible", "choose object over package; the package will be inacessible",
+         "throw error if package and object with the same name"),
+    "error")
   val inline          = BooleanSetting    ("-Yinline", "Perform inlining when possible.")
   val inlineHandlers  = BooleanSetting    ("-Yinline-handlers", "Perform exception handler inlining when possible.")
   val YinlinerWarnings= BooleanSetting    ("-Yinline-warnings", "Emit inlining warnings. (Normally surpressed due to high volume)")
-  val Xlinearizer     = ChoiceSetting     ("-Ylinearizer", "which", "Linearizer to use", List("normal", "dfs", "rpo", "dump"), "rpo")
+  val Xlinearizer     = ChoiceSetting     ("-Ylinearizer", "which", "Linearizer to use", List("normal", "dfs", "rpo", "dump"),
+    List("reverse post order linearizer","depth first linearizer", "simple linearizer", "do nothing"),
+    "rpo")
   val log             = PhasesSetting     ("-Ylog", "Log operations during")
   val Ylogcp          = BooleanSetting    ("-Ylog-classpath", "Output information about what classpath is being applied.")
   val Ynogenericsig   = BooleanSetting    ("-Yno-generic-signatures", "Suppress generation of generic signatures for Java.")
@@ -193,7 +199,10 @@ trait ScalaSettings extends AbsScalaSettings
   val Yrangepos       = BooleanSetting    ("-Yrangepos", "Use range positions for syntax trees.")
   val Ymemberpos      = StringSetting     ("-Yshow-member-pos", "output style", "Show start and end positions of members", "") withPostSetHook (_ => Yrangepos.value = true)
   val Yreifycopypaste = BooleanSetting    ("-Yreify-copypaste", "Dump the reified trees in copypasteable representation.")
-  val Ymacroexpand    = ChoiceSetting     ("-Ymacro-expand", "policy", "Control expansion of macros, useful for scaladoc and presentation compiler", List(MacroExpand.Normal, MacroExpand.None, MacroExpand.Discard), MacroExpand.Normal)
+  val Ymacroexpand    = ChoiceSetting     ("-Ymacro-expand", "policy", "Control expansion of macros, useful for scaladoc and presentation compiler",
+    List(MacroExpand.Normal, MacroExpand.None, MacroExpand.Discard),
+    List("expand macros", "do not expand macros (anything using macros past typer will crash)", "discard the content of macros after expansion"),
+    MacroExpand.Normal)
   val Ymacronoexpand  = BooleanSetting    ("-Ymacro-no-expand", "Don't expand macros. Might be useful for scaladoc and presentation compiler, but will crash anything which uses macros and gets past typer.") withDeprecationMessage(s"Use ${Ymacroexpand.name}:${MacroExpand.None}") withPostSetHook(_ => Ymacroexpand.value = MacroExpand.None)
   val Yreplsync       = BooleanSetting    ("-Yrepl-sync", "Do not use asynchronous code for repl startup")
   val Yreplclassbased = BooleanSetting    ("-Yrepl-class-based", "Use classes to wrap REPL snippets instead of objects")
@@ -207,7 +216,8 @@ trait ScalaSettings extends AbsScalaSettings
 
   val exposeEmptyPackage = BooleanSetting("-Yexpose-empty-package", "Internal only: expose the empty package.").internalOnly()
   // the current standard is "inline" but we are moving towards "method"
-  val Ydelambdafy        = ChoiceSetting     ("-Ydelambdafy", "strategy", "Strategy used for translating lambdas into JVM code.", List("inline", "method"), "inline")
+  val Ydelambdafy        = ChoiceSetting     ("-Ydelambdafy", "strategy", "Strategy used for translating lambdas into JVM code.",
+    List("inline", "method"), List("turn lambdas to anonymous Function classes", "try to lift lambdas into local methods"), "inline")
 
   private def removalIn212 = "This flag is scheduled for removal in 2.12. If you have a case where you need this flag then please report a bug."
 
@@ -253,6 +263,7 @@ trait ScalaSettings extends AbsScalaSettings
    */
   val Ybackend = ChoiceSetting ("-Ybackend", "choice of bytecode emitter", "Choice of bytecode emitter.",
                                 List("GenASM", "GenBCode"),
+                                List("standard backend", "new experimental backend"),
                                 "GenASM")
   // Feature extensions
   val XmacroSettings          = MultiStringSetting("-Xmacro-settings", "option", "Custom settings for macros.")

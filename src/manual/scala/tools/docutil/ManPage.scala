@@ -44,6 +44,7 @@ object ManPage {
   case class TitledPara(title: String, text: AbstractText) extends Paragraph
 
   case class EmbeddedSection(section: Section) extends Paragraph
+  case class EmbeddedParagraph(para: Paragraph) extends AbstractText
   implicit def section2Para(section: Section) = EmbeddedSection(section)
 
   case class Section(title: String, paragraphs: Paragraph*)
