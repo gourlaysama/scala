@@ -92,9 +92,7 @@ object scalap extends Command {
 
   def manpage = new Document {
     title = command
-    date = "June 2006"
     author = "Stephane Micheloud"
-    version = "1.0"
     sections = List(
       name,
       synopsis,

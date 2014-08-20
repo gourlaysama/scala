@@ -240,9 +240,7 @@ object scala extends Command with SettingPrinter {
 
   def manpage = new Document {
     title = command
-    date = "April 2007"
     author = "Stephane Micheloud"
-    version = "0.5"
     sections = List(
       name,
       synopsis,

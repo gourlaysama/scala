@@ -104,9 +104,7 @@ object scaladoc extends Command with SettingPrinter {
 
   def manpage = new Document {
     title = command
-    date = "June 2010"
     author = "Gilles Dubochet"
-    version = "2.0"
     sections = List(
       name,
       synopsis,

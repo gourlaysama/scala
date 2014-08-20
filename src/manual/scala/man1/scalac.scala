@@ -261,9 +261,7 @@ object scalac extends Command with SettingPrinter {
 
   def manpage = new Document {
     title = command
-    date = "March 2012"
     author = "Stephane Micheloud"
-    version = "1.0"
     sections = List(
       name,
       synopsis,

@@ -145,9 +145,7 @@ object fsc extends Command with SettingPrinter {
 
   def manpage = new Document {
     title = command
-    date = "March 2012"
     author = "Lex Spoon"
-    version = "0.5"
     sections = List(
       name,
       synopsis,
